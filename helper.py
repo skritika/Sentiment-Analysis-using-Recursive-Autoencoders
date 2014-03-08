@@ -18,9 +18,67 @@ class parameters:
 		self.bcat = np.zeros(cat_size, 1)
 	#def updateparams():
 		
+class tree:
+	def __init__(self, sl, hiddenSize, words):
+		self.sl = sl
+		self.hiddenSize = hiddenSize
+		self.words = words 
+		self.collapsed = range(1:sl+1)
+		self.pp = np.zeros((2*sl-1,1))		
+		self.nodeScores = np.zeros((2*sl-1,1))		
+		self.kids = np.zeros((2*sl-1,2))		
+		self.numkids = np.ones((2*sl-1,1))		
+		self.y1c1 = np.zeros((hiddenSize,2*sl-1))		
+		self.y2c2 = np.zeros((hiddenSize,2*sl-1))		
+		self.freq = np.zeros((2*sl-1,1))		
+		self.nodeFeatures = np.concatenate(words, np.zeros(hiddenSize,sl-1))
+		self.nodeFeatures_unnorm = np.concatenate(words, np.zeros(hiddenSize,sl-1))
+		self.delta1 = np.zeros((hiddenSize,2*sl-1))		
+		self.delta2 = np.zeros((hiddenSize,2*sl-1))		
 	
-		
+	def update1(self, freq, W1, W2, W3, W4, b1, b2, b3, alpha):
+		for j in range(1,self.sl)
+			words = self.words
+			lens = words.shape[1]
+			c1 = words[:,0:lens-1]
+			c2 = words[:,1:lens]
+			f1 = freq(0:lens-1)		
+			f2 = freq(1:lens)
+			hidden_out = np.tanh(np.dot(W1,c1)+np.dot(W2,c2)+np.tile(b1,lens-1))		
+			hidden_out_norm = hidden_out/hidden_out.sum(axis=1)[:,np.newaxis]
+			y1 = np.tanh(np.dot(W3,hidden_out_norm)+np.tile(b2,lens-1))			
+			y2 = np.tanh(np.dot(W4,hidden_out_norm)+np.tile(b3,lens-1))			
+			y1_norm = y1_norm/y1_norm.sum(axis=1)[:,np.newaxis]	
+			y2_norm = y2_norm/y2_norm.sum(axis=1)[:,np.newaxis]	
+			y1c1 = alpha*(y1-c1)
+			y2c2 = alpha*(y2-c2)
+			recons_error = sum(y1c1*(y1-c1)+y2c2*(y2-c2))*0.5
+			re_min = min(recons_error)
+			re_min_pos = amin(recons_error)
+			self.node_y1c1[:,sl+j] = y1c1[:,re_min_pos]	
+			self.node_y2c2[:,sl+j] = y2c2[:,re_min_pos]	
+			self.delta1[:,sl+j]	= dot(np.square(np.sech(y1[:,re_min_pos])), y1c1[:,re_min_pos])		
+			self.delta2[:,sl+j]	= dot(np.square(np.sech(y2[:,re_min_pos])), y2c2[:,re_min_pos])		
+			
+			delete(self.words, re_min_pos+1, 1)
+			self.words[:,re_min_pos] = hidden_out_norm[:,re_min_pos]
+			self.nodeFeatures[:,sl+j] = hidden_out_norm[:,re_min_pos]
+			self.nodeFeatures_unnorm[:,sl+j] = hidden_out[:,re_min_pos]
+			self.nodeScores[sl+j] = re_min
+			self.pp[collapsed_sentence[re_min_pos]] = sl+j;
+			self.pp[collapsed_sentence[re_min_pos+1]] = sl+j;
+			self.kids[sl+j,:] = concat(collapsed_sentence(re_min_pos), collapsed_sentence(re_min_pos))
+			self.numkids[sl+j,:] = self.numkids[self.kids[sl+j,1]] + self.numkids[self.kids[sl+j,2]]
+			delete(self.freq,re_min_pos+1,0) 
+			self.freq[re_min_pos] = dot(self.numkids[self.kids[sl+j,1]], f1[re_min_pos]) +  dot(self.numkids[self.kids[sl+j,2]], f2[re_min_pos])/self.numkids[sl+j,:]
+			delete(collapsed_sentence,re_min_pos)
+			collapsed_sentence[re_min_pos]=sl+j
 
+
+	def update2():	
+
+
+	
 def loaddata(path):
 
 	vocab = sio.loadmat(path+'vocab.mat', squeeze_me=True, struct_as_record=False)['words'] #vocabulary used 
