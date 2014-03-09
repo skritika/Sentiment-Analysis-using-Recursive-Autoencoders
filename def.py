@@ -37,7 +37,7 @@ def update1(self, freq, W1, W2, W3, W4, b1, b2, b3, alpha):
 		delete(self.collapsed,re_min_pos)
 		self.collapsed[re_min_pos]=sl+j
 
-def update2(self, allKids, Wcat, W1, W2, b1, bcat, alpha_cat, sentence_label, beta):	
+def update2(self, allKids, W1, W2, Wcat, b1, bcat, alpha_cat, sentence_label, beta):	
 	'''Classification error computation'''
 	lens = self.sl
 	nodeUnder = np.ones((2*lens-1,1))
@@ -72,6 +72,50 @@ def update2(self, allKids, Wcat, W1, W2, b1, bcat, alpha_cat, sentence_label, be
 		self.nodeFeatures_unnorm[:,i] = p
 		self.nodeScores[i] = J
 		self.numkids = nodeUnder
+	self.kids = allKids
+
+def backprop(self, flag_cat, training_data, training_labels, freq_original):#training_data is a list of lists
+	'''Backpropagation'''
+	W1 = self.W1
+	W2 = self.W2
+	W3 = self.W3
+	W4 = self.W4
+	Wcat = self.Wcat
+	b1 = self.b1
+	b2 = self.b2
+	bcat = self.bcat
+	We = self.We
+	
+	
+	for i in range(len(training_data)):
+		data = training_data[i]
+		true_label = training_labels[i]#not sure if this is the true_label
+		sl = len(data)
+	
+		word_indices = data
+		L = We[:,word_indices]#feature vectors for the words in sentences
+		words_emb = L #incomplete
+		grad_L = np.zeros((L.shape[0],L.shape[1]))		
+		freq = freq_original[word_indices]
+		tr = tree(sl, hiddenSize, words_emb)
+		if sl>1 : 
+		%Forward Propagation
+			if flag_cat:
+				tr.update2(allKids[i], W1, W2, Wcat, b1, bcat, alpha_cat, true_label, beta)
+			else:
+				tr.update1(freq, W1, W2, W3, W4, b1, b2, b3, alpha)
+		%Backpropagation
+			nodeFeatures = tr.nodeFeatures
+			nodeFeatures_unnorm = tr.nodeFeatures_unnorm
+			
+			while 
+			
+
+
+
+
+
+
 
 
 

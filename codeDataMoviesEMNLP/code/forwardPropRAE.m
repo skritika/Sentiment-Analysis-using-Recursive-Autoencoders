@@ -18,16 +18,16 @@ Tree.parentDelta = zeros(hiddenSize,2*sl-1);
 
 if updateWcat
     % Classification Error
-    nodeUnder = ones(2*sl-1,1);
+    nodeUnder = ones(2*sl-1,1);%nodes below a particular node's level
     
-    for i = sl+1:2*sl-1
+    for i = sl+1:2*sl-1%iterate through all the (sl-1) non-leaf nodes
         kids = allKids(i,:);
         n1 = nodeUnder(kids(1));
         n2 = nodeUnder(kids(2));
         nodeUnder(i) = n1+n2;
     end
     
-    [cat_size, ~] = size(Wcat);
+    [cat_size, ~] = size(Wcat);%number of categories 
     Tree.catDelta = zeros(cat_size, 2*sl-1);
     Tree.catDelta_out = zeros(hiddenSize,2*sl-1);
     
@@ -36,8 +36,6 @@ if updateWcat
     lbl_sm = (1-alpha_cat).*(label(:,ones(sl,1)) - sm);
     Tree.nodeScores(1:sl) = 1/2*(lbl_sm.*(label(:,ones(sl,1)) - sm));
     Tree.catDelta(:, 1:sl) = -(lbl_sm).*sigmoid_prime(sm);
-    
-    
     
     for i = sl+1:2*sl-1
         
