@@ -21,7 +21,7 @@ lambda(4) = lambda2(3);
 % data_cell=data_cell(1:2);
 
 [costRAE, gradRAE, allKids] = computeCostAndGradRAE([], theta1, 0, alpha_cat, cat_size, beta, dictionary_length, hiddenSize, ...
-    (alpha_cat)*lambda, We_orig , data_cell, labels, freq_orig, f, f_prime);
+    (alpha_cat)*lambda, We_orig , data_cell, labels, freq_orig, f, f_prime);%don't update Wcat
 
 
 WegradRAE = gradRAE(end-szWe+1:end);
