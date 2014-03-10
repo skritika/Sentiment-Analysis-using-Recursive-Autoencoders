@@ -1,50 +1,27 @@
-from def import*
-import numpy as np
+from def2 import *
 from scipy import io as sio
 import math
 
 class parameters:
 	def __init__(self, hiddenSize, visibleSize, cat_size, dictionary_length):
-		self.r = math.sqrt(6)/math.sqrt(hiddenSize+visibleSize+1)
+		r = math.sqrt(6)/math.sqrt(hiddenSize+visibleSize+1)
 		self.W1 = np.random.randn(hiddenSize, visibleSize)*2*r-r
 		self.W2 = np.random.randn(hiddenSize, visibleSize)*2*r-r
 		self.W3 = np.random.randn(visibleSize, hiddenSize)*2*r-r
 		self.W4 = np.random.randn(visibleSize, hiddenSize)*2*r-r
 		self.We = 1e-3*(np.random.randn(hiddenSize, dictionary_length)*2*r-r)
 		self.Wcat = np.random.randn(cat_size, hiddenSize)*2*r-r
-		self.b1 = np.zeros(hiddenSize, 1)
-		self.b2 = np.zeros(visibleSize, 1)
-		self.b3 = np.zeros(visibleSize, 1)
-		self.bcat = np.zeros(cat_size, 1)
-	#def updateparams():
-
-
-
-
-class tree:
-	def __init__(self, sl, hiddenSize, words):
-		self.sl = sl
+		self.b1 = np.zeros((hiddenSize, 1))
+		self.b2 = np.zeros((visibleSize, 1))
+		self.b3 = np.zeros((visibleSize, 1))
+		self.bcat = np.zeros((cat_size, 1))
 		self.hiddenSize = hiddenSize
-		self.words = words 
-		self.collapsed = range(1:sl+1)
-		self.pp = np.zeros((2*sl-1,1))		
-		self.nodeScores = np.zeros((2*sl-1,1))		
-		self.kids = np.zeros((2*sl-1,2))		
-		self.numkids = np.ones((2*sl-1,1))		
-		self.y1c1 = np.zeros((hiddenSize,2*sl-1))		
-		self.y2c2 = np.zeros((hiddenSize,2*sl-1))		
-		self.freq = np.zeros((2*sl-1,1))		
-		self.nodeFeatures = np.concatenate(words, np.zeros(hiddenSize,sl-1))
-		self.nodeFeatures_unnorm = np.concatenate(words, np.zeros(hiddenSize,sl-1))
-		self.delta1 = np.zeros((hiddenSize,2*sl-1))		
-		self.delta2 = np.zeros((hiddenSize,2*sl-1))
+		self.cat_size = cat_size
+		self.dictionary_length = dictionary_length
+	updateparams = backprop
 
-	u1 = update1
-	u2 = update2
-	
 	
 def loaddata(path):
-
 	vocab = sio.loadmat(path+'vocab.mat', squeeze_me=True, struct_as_record=False)['words'] #vocabulary used 
 	print type(vocab)
 	data_pos = sio.loadmat(path+'rt-polarity_pos_binarized.mat', squeeze_me=True, struct_as_record=False) 
