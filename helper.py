@@ -3,7 +3,7 @@ from scipy import io as sio
 import math
 
 class parameters:
-	def __init__(self, hiddenSize, visibleSize, cat_size, dictionary_length):
+	def __init__(self, hiddenSize, visibleSize, cat_size, dictionary_length, alpha, beta):
 		r = math.sqrt(6)/math.sqrt(hiddenSize+visibleSize+1)
 		self.W1 = np.random.randn(hiddenSize, visibleSize)*2*r-r
 		self.W2 = np.random.randn(hiddenSize, visibleSize)*2*r-r
@@ -18,6 +18,8 @@ class parameters:
 		self.hiddenSize = hiddenSize
 		self.cat_size = cat_size
 		self.dictionary_length = dictionary_length
+		self.alpha = alpha
+		self.beta = beta
 	updateparams = backprop
 
 	

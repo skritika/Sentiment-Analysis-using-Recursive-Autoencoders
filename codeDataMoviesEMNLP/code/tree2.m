@@ -3,7 +3,6 @@ classdef tree2
     properties
         % parent pointers
         pp = [];
-        nodeNames;
         nodeFeatures_unnormalized =[];
         nodeFeatures = [];
         leafFeatures=[];
@@ -21,10 +20,6 @@ classdef tree2
         parentDelta = [];
         catDelta = [];
         catDelta_out = [];
-        node_dW1 = [];
-        node_dW2 = [];
-        node_dW3 = [];
-        node_dW4 = [];
         node_dL = [];
         node_y1c1 = [];
         node_y2c2 = [];

@@ -4,7 +4,6 @@ collapsed_sentence = 1:sl;
 Tree = tree2;
 Tree.pp = zeros((2*sl-1),1);
 Tree.nodeScores = zeros(2*sl-1,1);
-Tree.nodeNames = 1:(2*sl-1);
 Tree.kids = zeros(2*sl-1,2);
 Tree.numkids = ones(2*sl-1,1);
 Tree.node_y1c1 = zeros(hiddenSize,2*sl-1);
@@ -51,9 +50,8 @@ if updateWcat
         p_norm1 = p./norm(p);
         
         % Eq. (7) in the paper (for special case of 1d label)
-        sm = sigmoid(Wcat*p_norm1 + bcat);
-        
-        lbl_sm = beta * (1-alpha_cat).*(label - sm);
+        sm = sigmoid(Wcat*p_norm1 + bcat);#Wcat = cat_size x d, p_norm1 =  d x (sl-1), sm = cat_size x (sl-1) 
+        lbl_sm = beta * (1-alpha_cat).*(label - sm);#cat_size x (sl-1)
         Tree.catDelta(:, i) = -(lbl_sm).*sigmoid_prime(sm);
         J = 1/2*(lbl_sm'*(label - sm));
         
