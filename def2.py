@@ -47,7 +47,6 @@ def update2(self, allKids, W1, W2, Wcat, b1, bcat, alpha_cat, sentence_label, be
 	num_cat = Wcat.shape[0]
 	self.catdelta, self.catdelta_out = np.zeros((num_cat, 2*lens-1)), np.zeros((self.hiddenSize, 2*lens-1))
 	
-	#I have no idea why but they are finding labels for single words here
 	out = f(np.dot(Wcat,self.words)+np.tile(bcat,lens))#check function, tanh is not exactly sigmoid
 	#out is of size num_catxlens
 	#The following line needs to be changed for multiple categories, it expects sentence_label to be of size num_cat

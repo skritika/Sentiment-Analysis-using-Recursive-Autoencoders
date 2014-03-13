@@ -1,4 +1,5 @@
-from def2 import *
+#from def2 import *
+from backprop import *
 from scipy import io as sio
 import math
 

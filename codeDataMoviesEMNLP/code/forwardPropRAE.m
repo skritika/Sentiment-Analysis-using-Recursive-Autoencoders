@@ -50,7 +50,7 @@ if updateWcat
         p_norm1 = p./norm(p);
         
         % Eq. (7) in the paper (for special case of 1d label)
-        sm = sigmoid(Wcat*p_norm1 + bcat);#Wcat = cat_size x d, p_norm1 =  d x (sl-1), sm = cat_size x (sl-1) 
+        sm = sigmoid(Wcat*p_norm1 + bcat);#Wcat = cat_size x d, p_norm1 =  d x 1, sm = cat_size x 1
         lbl_sm = beta * (1-alpha_cat).*(label - sm);#cat_size x (sl-1)
         Tree.catDelta(:, i) = -(lbl_sm).*sigmoid_prime(sm);
         J = 1/2*(lbl_sm'*(label - sm));
