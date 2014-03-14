@@ -54,7 +54,7 @@ parfor ii = range;
             Tree = forwardPropRAE([], W1,W2,W3,W4,b1,b2,b3, Wcat, bcat, alpha_cat, updateWcat,beta, words_embedded, labels, hiddenSize, sl, freq, f, f_prime);
             allKids{ii} = Tree.kids;
             cost = sum(Tree.nodeScores(sl+1:end)) ;
-            num_nodes = num_nodes + sl;
+            num_nodes = num_nodes + sl - 1;
         end
         
         %Backprop
@@ -139,9 +139,7 @@ parfor ii = range;
     
 end
 
-if ~updateWcat
-    num_nodes = num_nodes - length(range);
-end
+
 
 cost_total = 1/num_nodes*cost_total + lambdaW/2 * ( W1(:)'*W1(:) + W2(:)'*W2(:) + W3(:)'*W3(:) + W4(:)'*W4(:) );
 
