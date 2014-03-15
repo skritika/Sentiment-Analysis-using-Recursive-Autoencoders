@@ -17,37 +17,38 @@ def backprop(self, training_data, training_labels, freq_original):
 		tr = tree(sl, self.hiddenSize, self.cat_size, L)
 		if sl>1 : 
 			tr.forward(freq, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, self.alpha, self.beta, true_label)
-			print tr.checkgradient(freq, 0.000000001, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, self.alpha, self.beta, true_label)
 			for current in range(2*sl-2,sl-1,-1):
 				kid1, kid2 = tr.kids[current,0], tr.kids[current,1]
-				a1, a1_unnorm = tr.nodeFeatures[:,current][:,np.newaxis], tr.nodeFeatures_unnorm[:,current][:,np.newaxis]
-				d1, d2 = tr.delta1[:,current][:,np.newaxis], tr.delta1[:,current][:,np.newaxis]
-				pd = tr.parentdelta[:,current][:,np.newaxis]
+				a1, a1_unnorm = tr.nodeFeatures[:,current:current+1], tr.nodeFeatures_unnorm[:,current:current+1]
+				d1, d2 = tr.delta1[:,current:current+1], tr.delta1[:,current:current+1]
+				pd = tr.parentdelta[:,current:current+1]
 				pp = tr.pp[current]
 				if(current==(2*sl-2)):
 					W = np.zeros((self.hiddenSize,self.hiddenSize))
+					delt = np.zeros((self.hiddenSize, 1))
 				else:
-					W=W2
+					W, delt = W2.copy(), tr.y2c2[:,pp:pp+1] 
 					if(tr.kids[pp,0]==current):#left_child
-						W = W1
-				smd = tr.catdelta[:, current][:,np.newaxis]
+						W, delt = W1.copy(), tr.y1c1[:,pp:pp+1]
+				smd = tr.catdelta[:, current:current+1]
 				gbcat += smd
-				h = np.dot(W3.T, d1) + np.dot(W4.T, d2) + np.dot(W.T, pd) + np.dot(Wcat.T, smd)
-				parent_d = np.dot(f_prime(a1_unnorm), np.dot(W3.T, d1)+np.dot(W4.T, d2)+np.dot(W.T, pd)+np.dot(Wcat.T, smd))
+				h = np.dot(W3.T, d1) + np.dot(W4.T, d2) + np.dot(W.T, pd) + np.dot(Wcat.T, smd) - delt
+				parent_d = np.dot(f_prime(a1_unnorm), h)
 				gWcat += np.dot(smd,a1.T)
 				tr.parentdelta[:,kid1:kid1+1], tr.parentdelta[:,kid2:kid2+1] = parent_d, parent_d
 				gb1, gb2, gb3 = gb1+parent_d, gb2+d1, gb3+d2
-				gW1, gW2, gW3, gW4 = gW1 + np.dot(parent_d, tr.nodeFeatures[:,kid1][:,np.newaxis].T), gW2 + np.dot(parent_d, tr.nodeFeatures[:,kid2][:,np.newaxis].T), gW3 + np.dot(d1,a1.T), gW4 + np.dot(d2,a1.T)
+				gW1, gW2, gW3, gW4 = gW1 + np.dot(parent_d, tr.nodeFeatures[:,kid1:kid1+1].T), gW2 + np.dot(parent_d, tr.nodeFeatures[:,kid2:kid2+1].T), gW3 + np.dot(d1,a1.T), gW4 + np.dot(d2,a1.T)
 			for j in range(sl-1,-1,-1):
 				pp = tr.pp[j]
-				W=W2
+				W, delt = W2.copy(), tr.y2c2[:,pp:pp+1] 
 				if(tr.kids[pp,0]==j):#left_child
-					W = W1
-				gWcat += np.dot(tr.catdelta[:,j][:,np.newaxis],tr.nodeFeatures[:,j][:,np.newaxis].T) 
+					W, delt = W1.copy(), tr.y1c1[:,pp:pp+1]
+				gWcat += np.dot(tr.catdelta[:,j:j+1],tr.nodeFeatures[:,j:j+1].T) 
 				gbcat += tr.catdelta[:,j]  
-				gL[:,j] += np.dot(W.T,tr.parentdelta[:,j]) + np.dot(Wcat.T,tr.catdelta[:,j]) 	
+				gL[:,j:j+1] += np.dot(W.T,tr.parentdelta[:,j:j+1]) + np.dot(Wcat.T,tr.catdelta[:,j:j+1]) - delt 	
 				gWe[:,word_indices[j]] += gL[:,j]
-				print gW1[1,1]
+			print gW1[1,1]
+			print tr.checkgradient(freq, 0.000001, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, self.alpha, self.beta, true_label)
 		gWe_tot += gWe
 		
 		

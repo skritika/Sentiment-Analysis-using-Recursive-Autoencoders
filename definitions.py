@@ -9,19 +9,21 @@ def f(x):
 	return fnorm	
 
 def fcat(x):
-	return 1/(1+np.exp(x))
+	return 1/(1+np.exp(-x))
 
 def f_prime(x):
-	f = np.tanh(x)
-	f_p = 1 - np.square(np.tanh(x))
+	f = x
+	#f = np.tanh(x)
+	f_p = 1 - np.square(f)
 	diag = np.diagflat(f_p)
-	norm = np.linalg.norm(np.tanh(x))
+	norm = np.linalg.norm(f)
 	fnorm_p = diag/norm - np.dot(diag, np.dot(f, f.T))/np.power(norm,3)
 	#return f_p
 	return fnorm_p
 
 def fcat_prime(x):
-	return fcat(x)*(1-fcat(x))
+	#return fcat(x)*(1-fcat(x))
+	return x*(1-x)
 
 class tree:
 	def __init__(self, sl, hiddenSize, cat_size, words):
@@ -37,8 +39,8 @@ class tree:
 		self.y1c1 = np.zeros((hiddenSize,2*sl-1))		
 		self.y2c2 = np.zeros((hiddenSize,2*sl-1))		
 		self.freq = np.zeros((2*sl-1,1))		
-		self.nodeFeatures = np.concatenate([words, np.zeros((hiddenSize,sl-1))], axis=1)
-		self.nodeFeatures_unnorm = np.concatenate([words, np.zeros((hiddenSize,sl-1))], axis=1)
+		self.nodeFeatures = np.concatenate((words, np.zeros((hiddenSize,sl-1))), axis=1)
+		self.nodeFeatures_unnorm = np.concatenate((words, np.zeros((hiddenSize,sl-1))), axis=1)
 		self.delta1 = np.zeros((hiddenSize,2*sl-1))		
 		self.delta2 = np.zeros((hiddenSize,2*sl-1))
 		self.parentdelta = np.zeros((hiddenSize,2*sl-1))
@@ -87,11 +89,11 @@ class tree:
 			self.nodeScores[i] = J
 	
 	def cost(self, w, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, alpha, beta, sentence_label):
-		words = w
+		words = w.copy()
 		sl = self.sl
 		nodeScoresR = np.zeros((2*sl-1,1))		
 		nodeScores = np.zeros((2*sl-1,1))		
-		nF = self.nodeFeatures
+		nF = self.nodeFeatures.copy()
 		nF[:,0:sl] = w
 		for j in range(0,sl-1):
 			k1, k2 = self.kids[sl+j,0], self.kids[sl+j,1]
@@ -113,7 +115,7 @@ class tree:
 		return error
 
 	def checkgradient(self, freq, eps, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, alpha, beta, sl):
-		w = self.words
+		w = self.words.copy()
 		W1a, W1b = W1.copy(), W1.copy()
 		W1a[1,1], W1b[1,1] = W1[1,1] + eps, W1[1,1] - eps
 		j1 = self.cost(w,W1a,W2,W3,W4,Wcat,b1,b2,b3,bcat,alpha,beta,sl)
