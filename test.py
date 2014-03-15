@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def f(x):
 	(n1, n2) = x.shape
 	f = np.tanh(x)
