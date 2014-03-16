@@ -15,8 +15,7 @@ def accuracy(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test
 	correct = 0
 	for i in range(len(test_sentences)):
 		p = predict(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test_sentences[i], d, num_cat)
-		print predict
-		correct += 1*(p==labels[i])
+		correct += 1*(p[0]==labels[i])
 	return correct/float(n)
 	
 def loaddata(path):
@@ -47,7 +46,7 @@ def load():
 	train = []
 	for i in range(data.shape[0]):
 		x = data[i]
-		y = x[0]
+		y = x[0]-1
 		z = y.tolist()
 		u = z[0]
 		train.append(u)

@@ -84,7 +84,7 @@ def backprop(x, training_data, training_labels, freq_original, d, num_cat, dict_
 	if(x==1):
 		return grad
 	else:
-		return cost
+		return cost[0]
 	
 
 	
