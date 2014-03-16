@@ -67,19 +67,18 @@ def backprop(theta, training_data, training_labels, freq_original, d, num_cat, d
 				gL[:,j:j+1] += np.dot(W.T,tr.parentdelta[:,j:j+1]) + np.dot(Wcat.T,tr.catdelta[:,j:j+1]) - delt 	
 				gWe[:,word_indices[j]] += gL[:,j]
 			cost_J += sum(tr.nodeScores) + sum(tr.nodeScoresR)
-		#	print gWe[0,2]
-		#	print tr.checkgradient(word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, true_label)
+			#print gW1[0,2]
+			#print tr.checkgradient(word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, true_label)
 	F = np.ndarray.flatten
 	D = np.dot
 	#final grad computation
 	grad_J = np.concatenate([F(gW1),F(gW2),F(gW3),F(gW4),F(gWcat),F(gWe),F(gb1),F(gb2),F(gb3),F(gbcat)],axis=1)
-	grad_reg = np.concatenate([F(W1),F(W2),F(W3),F(W4),F(Wcat),F(We),np.zeros((1,d)),np.zeros((1,d)),np.zeros((1,d)),np.zeros((1,num_cat))],axis=1)
+	grad_reg = np.concatenate([F(W1),F(W2),F(W3),F(W4),F(Wcat),F(We),np.zeros(d),np.zeros(d),np.zeros(d),np.zeros(num_cat)],axis=1)
 	grad = grad_J/len(training_data) + .0004*grad_reg
-	print grad.shape
 	#final cost computation		
 	cost_reg = .0002*(D(F(W1),F(W1).T)+D(F(W2),F(W2).T)+D(F(W3),F(W3).T)+D(F(W4),F(W4).T)+D(F(Wcat),F(Wcat).T)+D(F(We),F(We).T))
 	cost = cost_J/len(training_data) + cost_reg
-	#return (grad, cost)
+	return (grad, cost)
 		
 		
 
