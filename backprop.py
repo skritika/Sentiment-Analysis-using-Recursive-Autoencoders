@@ -8,13 +8,23 @@ def predict(self, freq, test_sentence):
 	pred = fcat(np.dot(self.Wcat,tr.nodeFeatures[:,2*sl-2]))
 	return 1*(pred>0.5)
 			
+def getW(theta, d, num_cat, dict_length):
+	sW = (d, d)
+	sb = (d, 1)
+	s = d*d
+	s2 = num_cat*d
+	s3 = dict_length*d
+	W1, W2, W3, W4, Wcat, We = theta[0,0:s].reshape(sW), theta[0,s:2*s].reshape(sW), theta[0,2*s:3*s].reshape(sW), theta[0,3*s:4*s].reshape(sW), theta[0,4*s:4*s+s2].reshape((num_cat,d)), theta[0,4*s+s2:4*s+s2+s3].reshape((d,dict_length))
+	s4 = 4*s+s2+s3 
+	b1, b2, b3, bcat = theta[0,s4:s4+d].reshape(sb), theta[0,s4+d:s4+2*d].reshape(sb), theta[0,s4+2*d:s4+3*d].reshape(sb), theta[0,s4+3*d:s4+3*d+num_cat].reshape((num_cat,1))
+	return (W1,W2,W3,W4,Wcat,We,b1,b2,b3,bcat)
+
 '''Backpropagation for derivative and cost computation'''
-def backprop(self, training_data, training_labels, freq_original):
-	W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, We = self.W1, self.W2, self.W3, self.W4, self.Wcat, self.b1, self.b2, self.b3, self.bcat, self.We
-	sW = (self.hiddenSize, self.hiddenSize)
-	sb = (self.hiddenSize, 1)
-	gW1, gW2, gW3, gW4, gWcat, gb1, gb2, gb3, gbcat, gWe = np.zeros(sW), np.zeros(sW), np.zeros(sW), np.zeros(sW), np.zeros((self.cat_size, self.hiddenSize)), np.zeros(sb), np.zeros(sb), np.zeros(sb), np.zeros((self.cat_size,1)), np.zeros((self.hiddenSize, self.dictionary_length))
-	gWe_tot = np.zeros((self.hiddenSize, self.dictionary_length))	
+def backprop(theta, training_data, training_labels, freq_original, d, num_cat, dict_length, alpha, beta):
+	sW = (d, d)
+	sb = (d, 1)
+	(W1,W2,W3,W4,Wcat,We,b1,b2,b3,bcat) = getW(theta, d, num_cat, dict_length)
+	gW1, gW2, gW3, gW4, gWcat, gb1, gb2, gb3, gbcat, gWe = np.zeros(sW), np.zeros(sW), np.zeros(sW), np.zeros(sW), np.zeros((num_cat, d)), np.zeros(sb), np.zeros(sb), np.zeros(sb), np.zeros((num_cat,1)), np.zeros((d, dict_length))
 	cost_J = 0.0
 	for i in range(len(training_data)):
 		word_indices = training_data[i]
@@ -23,9 +33,9 @@ def backprop(self, training_data, training_labels, freq_original):
 		L = We[:,word_indices]
 		gL = np.zeros((L.shape[0],L.shape[1]))		
 		freq = [freq_original[k] for k in word_indices]
-		tr = tree(sl, self.hiddenSize, self.cat_size, L)
+		tr = tree(sl, d, num_cat, L)
 		if sl>1 : 
-			tr.forward(freq, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, self.alpha, self.beta, true_label)
+			tr.forward(freq, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, alpha, beta, true_label)
 			for current in range(2*sl-2,sl-1,-1):
 				kid1, kid2 = tr.kids[current,0], tr.kids[current,1]
 				a1, a1_unnorm = tr.nodeFeatures[:,current:current+1], tr.nodeFeatures_unnorm[:,current:current+1]
@@ -33,8 +43,8 @@ def backprop(self, training_data, training_labels, freq_original):
 				pd = tr.parentdelta[:,current:current+1]
 				pp = tr.pp[current]
 				if(current==(2*sl-2)):
-					W = np.zeros((self.hiddenSize,self.hiddenSize))
-					delt = np.zeros((self.hiddenSize, 1))
+					W = np.zeros((d,d))
+					delt = np.zeros((d, 1))
 				else:
 					W, delt = W2.copy(), tr.y2c2[:,pp:pp+1] 
 					if(tr.kids[pp,0]==current):#left_child
@@ -55,20 +65,19 @@ def backprop(self, training_data, training_labels, freq_original):
 				gWcat += np.dot(tr.catdelta[:,j:j+1],tr.nodeFeatures[:,j:j+1].T) 
 				gbcat += tr.catdelta[:,j]  
 				gL[:,j:j+1] += np.dot(W.T,tr.parentdelta[:,j:j+1]) + np.dot(Wcat.T,tr.catdelta[:,j:j+1]) - delt 	
-				gWe_tot[:,word_indices[j]] += gL[:,j]
+				gWe[:,word_indices[j]] += gL[:,j]
 			cost_J += sum(tr.nodeScores) + sum(tr.nodeScoresR)
-			print gWe[0,2]
-			print tr.checkgradient(word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, self.alpha, self.beta, true_label)
-		gWe_tot += gWe
+		#	print gWe[0,2]
+		#	print tr.checkgradient(word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, true_label)
 	F = np.ndarray.flatten
 	D = np.dot
 	#final grad computation
-	grad_J = np.concatenate([F(gW1),F(gW2),F(gW3),F(gW4),F(gWcat),F(gb1),F(gb2),F(gb3),F(gbcat),F(gWe_tot)],axis=1)
-	grad_reg = np.concatenate([F(W1),F(W2),F(W3),F(W4),F(Wcat),F(b1),F(b2),F(b3),F(We)],axis=1)
-	#grad = grad_J/len(training_data) + .0004*grad_reg
-	#print grad.shape
+	grad_J = np.concatenate([F(gW1),F(gW2),F(gW3),F(gW4),F(gWcat),F(gWe),F(gb1),F(gb2),F(gb3),F(gbcat)],axis=1)
+	grad_reg = np.concatenate([F(W1),F(W2),F(W3),F(W4),F(Wcat),F(We),np.zeros((1,d)),np.zeros((1,d)),np.zeros((1,d)),np.zeros((1,num_cat))],axis=1)
+	grad = grad_J/len(training_data) + .0004*grad_reg
+	print grad.shape
 	#final cost computation		
-	cost_reg = .0004*(D(F(W1),F(W1).T)+D(F(W2),F(W2).T)+D(F(W3),F(W3).T)+D(F(W4),F(W4).T)+D(F(Wcat),F(Wcat).T)+D(F(We),F(We).T))
+	cost_reg = .0002*(D(F(W1),F(W1).T)+D(F(W2),F(W2).T)+D(F(W3),F(W3).T)+D(F(W4),F(W4).T)+D(F(Wcat),F(Wcat).T)+D(F(We),F(We).T))
 	cost = cost_J/len(training_data) + cost_reg
 	#return (grad, cost)
 		

@@ -3,27 +3,12 @@ from backprop import *
 import scipy.io
 import math
 
-class parameters:
-	def __init__(self, hiddenSize, visibleSize, cat_size, dictionary_length, alpha, beta):
-		r = math.sqrt(6)/math.sqrt(hiddenSize+visibleSize+1)
-		self.W1 = np.random.rand(hiddenSize, visibleSize)*2*r-r
-		self.W2 = np.random.rand(hiddenSize, visibleSize)*2*r-r
-		self.W3 = np.random.rand(visibleSize, hiddenSize)*2*r-r
-		self.W4 = np.random.rand(visibleSize, hiddenSize)*2*r-r
-		self.We = 1e-3*(np.random.rand(hiddenSize, dictionary_length)*2*r-r)
-		self.Wcat = np.random.rand(cat_size, hiddenSize)*2*r-r
-		self.b1 = np.zeros((hiddenSize, 1))
-		self.b2 = np.zeros((visibleSize, 1))
-		self.b3 = np.zeros((visibleSize, 1))
-		self.bcat = np.zeros((cat_size, 1))
-		self.hiddenSize = hiddenSize
-		self.cat_size = cat_size
-		self.dictionary_length = dictionary_length
-		self.alpha = alpha
-		self.beta = beta
-	computeder = backprop
-	predict = predict
-
+def init_theta(d, num_cat, dict_length):
+		r = math.sqrt(6)/math.sqrt(d+d+1)
+		#We = 1e-3*(np.random.rand(hiddenSize, dictionary_length)*2*r-r)
+		W = np.random.rand(1,4*d*d+d*num_cat+d*dict_length)*2*r-r #W1+W2+W3+W4+Wcat+We
+		b = np.zeros((1,3*d+num_cat))
+		return np.concatenate([W,b],axis=1)
 
 def accuracy(test_sentences, labels, freq, p):
 	n = len(test_sentences)
