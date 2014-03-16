@@ -1,13 +1,11 @@
 from helper import *
 import scipy.io
+from scipy.optimize import fmin_l_bfgs_b
 #loaddata("codeDataMoviesEMNLP/data/rt-polaritydata/")
 #vocab = 10
 
 (train, labels) = load()
 #freq = [1/float(14043)]*14043
-freq = [0.1]*10
-train2 = [[1,2,3], [3,4,5], [1,3,9], [2,4,2]]
-labels2 = [0, 0, 1, 1]
 hiddenSize = 5
 #p = parameters(hiddenSize,hiddenSize,1,10,0.2,0.5)
 #p.updateparams(0, data, labels, freq)
@@ -17,7 +15,20 @@ hiddenSize = 5
 #print y
 #print accuracy(train2, labels2, freq, p)
 initv = init_theta(5,1,10)
-print initv.shape
-backprop(initv, train2, labels2, freq, 5, 1, 10, 0.2, 0.5)
+
+
+
+d = 5
+train2 = [[1,2,3], [3,4,5], [1,3,9], [2,4,2]]
+labels2 = [0, 0, 1, 1]
+num_cat = 1
+dict_length = 10
+alpha = 0.2
+beta = 0.5
+freq = [0.1]*10
+fgrad = partial(backprop, 1, train2, labels2, freq, d, num_cat, dict_length, alpha, beta)
+fcost = partial(backprop, 0, train2, labels2, freq, d, num_cat, dict_length, alpha, beta)
+
+theta_min = fmin_l_bfgs_b(fcost, initv, fprime = fgrad) 
 
 

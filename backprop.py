@@ -1,4 +1,5 @@
 from definitions import *
+from functools import partial
 
 def predict(self, freq, test_sentence):
 	sl = len(test_sentence)
@@ -19,8 +20,9 @@ def getW(theta, d, num_cat, dict_length):
 	b1, b2, b3, bcat = theta[0,s4:s4+d].reshape(sb), theta[0,s4+d:s4+2*d].reshape(sb), theta[0,s4+2*d:s4+3*d].reshape(sb), theta[0,s4+3*d:s4+3*d+num_cat].reshape((num_cat,1))
 	return (W1,W2,W3,W4,Wcat,We,b1,b2,b3,bcat)
 
+
 '''Backpropagation for derivative and cost computation'''
-def backprop(theta, training_data, training_labels, freq_original, d, num_cat, dict_length, alpha, beta):
+def backprop(x, training_data, training_labels, freq_original, d, num_cat, dict_length, alpha, beta, theta):
 	sW = (d, d)
 	sb = (d, 1)
 	(W1,W2,W3,W4,Wcat,We,b1,b2,b3,bcat) = getW(theta, d, num_cat, dict_length)
@@ -78,7 +80,9 @@ def backprop(theta, training_data, training_labels, freq_original, d, num_cat, d
 	#final cost computation		
 	cost_reg = .0002*(D(F(W1),F(W1).T)+D(F(W2),F(W2).T)+D(F(W3),F(W3).T)+D(F(W4),F(W4).T)+D(F(Wcat),F(Wcat).T)+D(F(We),F(We).T))
 	cost = cost_J/len(training_data) + cost_reg
-	return (grad, cost)
-		
+	if(x==1):
+		return grad
+	else:
+		return cost
 		
 
