@@ -1,6 +1,6 @@
 #from def2 import *
 from backprop import *
-from scipy import io as sio
+import scipy.io
 import math
 
 class parameters:
@@ -21,8 +21,16 @@ class parameters:
 		self.dictionary_length = dictionary_length
 		self.alpha = alpha
 		self.beta = beta
-	updateparams = backprop
+	computeder = backprop
+	predict = predict
 
+
+def accuracy(test_sentences, labels, freq, p):
+	n = len(test_sentences)
+	correct = 0
+	for i in range(len(test_sentences)):
+		correct += 1*(p.predict(freq,test_sentences[i])==labels[i])
+	return correct/float(n)
 	
 def loaddata(path):
 	vocab = sio.loadmat(path+'vocab.mat', squeeze_me=True, struct_as_record=False)['words'] #vocabulary used 
@@ -44,6 +52,30 @@ def loaddata(path):
 	allSNum[6549] = 20143;
 	allSStr[9800] = [u'crummy'];
 	allSNum[9800] = 241211;
+
+
+def load():
+	data = scipy.io.loadmat('data.mat')
+	data = data['snum']
+	train = []
+	for i in range(data.shape[0]):
+		x = data[i]
+		y = x[0]
+		z = y.tolist()
+		u = z[0]
+		train.append(u)
+
+	lbl = scipy.io.loadmat('labels.mat')
+	lbl = lbl['lbl']
+	lbl = lbl[0]
+	labels = []
+	for i in range(lbl.shape[0]):
+		labels.append(lbl[i])	
+	return (train, labels)
+
+
+
+
 
 
 
