@@ -10,11 +10,13 @@ def init_theta(d, num_cat, dict_length):
 		b = np.zeros((1,3*d+num_cat))
 		return np.concatenate([W,b],axis=1)
 
-def accuracy(test_sentences, labels, freq, p):
+def accuracy(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test_sentences, labels, d, num_cat):
 	n = len(test_sentences)
 	correct = 0
 	for i in range(len(test_sentences)):
-		correct += 1*(p.predict(freq,test_sentences[i])==labels[i])
+		p = predict(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test_sentences[i], d, num_cat)
+		print predict
+		correct += 1*(p==labels[i])
 	return correct/float(n)
 	
 def loaddata(path):

@@ -1,15 +1,16 @@
 from definitions import *
 from functools import partial
 
-def predict(self, freq, test_sentence):
+def predict(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test_sentence, d, num_cat):
 	sl = len(test_sentence)
-	L = self.We[:,test_sentence]
-	tr = tree(sl, self.hiddenSize, self.cat_size, L)
-	tr.forward(freq, self.W1, self.W2, self.W3, self.W4, self.Wcat, self.b1, self.b2, self.b3, self.bcat, self.alpha, self.beta, 0)
-	pred = fcat(np.dot(self.Wcat,tr.nodeFeatures[:,2*sl-2]))
+	L = We[:,test_sentence]
+	tr = tree(sl, d, num_cat, L)
+	tr.forward(freq, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, alpha, beta, 0)
+	pred = fcat(np.dot(Wcat,tr.nodeFeatures[:,2*sl-2]))
 	return 1*(pred>0.5)
 			
-def getW(theta, d, num_cat, dict_length):
+def getW(t, d, num_cat, dict_length):
+	theta = t[np.newaxis,:]
 	sW = (d, d)
 	sb = (d, 1)
 	s = d*d
@@ -84,5 +85,7 @@ def backprop(x, training_data, training_labels, freq_original, d, num_cat, dict_
 		return grad
 	else:
 		return cost
-		
+	
+
+	
 
