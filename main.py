@@ -39,9 +39,9 @@ fgrad = partial(backprop, 1, train, labels, freq, d, num_cat, dict_length, alpha
 fcost = partial(backprop, 0, train, labels, freq, d, num_cat, dict_length, alpha, beta)
 
 
-#backprop(1, train, labels, freq, d, num_cat, dict_length, alpha, beta, initv)
-theta_min = fmin_l_bfgs_b(fcost, initv, fprime = fgrad, args=(), maxiter=100, disp=1)[0] 
-(W1,W2,W3,W4,Wcat,We,b1,b2,b3,bcat) = getW(theta_min, d, num_cat, dict_length)
+backprop(1, train, labels, freq, d, num_cat, dict_length, alpha, beta, initv)
+#theta_min = fmin_l_bfgs_b(fcost, initv, fprime = fgrad, args=(), maxiter=100, disp=1)[0] 
+#(W1,W2,W3,W4,Wcat,We,b1,b2,b3,bcat) = getW(theta_min, d, num_cat, dict_length)
 #test = train
 #test_labels = labels
 #print accuracy(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test, test_labels, d, num_cat)

@@ -134,16 +134,18 @@ class tree:
 		e = eps_min
 		e_range = []
 		while(e<1):
-			e_range.append(np.log10(e))
+			e_range.append(e)
 			e=e*10
 		J_range = []
+		#W2a[3,3], W2b[3,3] = W2[3,3] + eps, W2[3,3] - eps
+		#W1a[0,2], W1b[0,2] = W1[0,2] + eps, W1[0,2] - eps
+		#W3a[3,4], W3b[3,4] = W3[3,4] + eps, W3[3,4] - eps
+		#W4a[2,4], W4b[2,4] = W4[2,4] + eps, W4[2,4] - eps
+		#Wcata[0,0], Wcatb[0,0] = Wcat[0,0] + eps, Wcat[0,0] - eps
+		#wa[0,1], wb[0,1] = w[0,1] + eps, w[0,1] - eps	
 		for  eps in e_range:			
-				#W2a[3,3], W2b[3,3] = W2[3,3] + eps, W2[3,3] - eps
+				W1a, W1b = W1.copy(), W1.copy()
 				W1a[0,2], W1b[0,2] = W1[0,2] + eps, W1[0,2] - eps
-				#W3a[3,4], W3b[3,4] = W3[3,4] + eps, W3[3,4] - eps
-				#W4a[2,4], W4b[2,4] = W4[2,4] + eps, W4[2,4] - eps
-				#Wcata[0,0], Wcatb[0,0] = Wcat[0,0] + eps, Wcat[0,0] - eps
-				#wa[0,1], wb[0,1] = w[0,1] + eps, w[0,1] - eps	
 				j1 = self.cost(wa,W1a,W2a,W3a,W4a,Wcata,b1,b2,b3,bcat,alpha,beta,sl)
 				j2 = self.cost(wb,W1b,W2b,W3b,W4b,Wcatb,b1,b2,b3,bcat,alpha,beta,sl)
 				grad = (j1-j2)/(2*eps)

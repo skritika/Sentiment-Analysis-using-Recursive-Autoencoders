@@ -75,7 +75,7 @@ def backprop(x, training_data, training_labels, freq_original, d, num_cat, dict_
 			cost_J += sum(tr.nodeScores) + sum(tr.nodeScoresR)
 			actual = gW1[0,2]
 			tr.checkgradient(actual, word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, true_label)
-			#exit()
+			exit()
 	F = np.ndarray.flatten
 	D = np.dot
 	#final grad computation
