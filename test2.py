@@ -1,16 +1,14 @@
 def f(n):
-	x = n*n
-	y = n+n
-	def ret1():
-		return x
-	def ret2():
-		return y
+	def ret1(n):
+		return n*n
+	def ret2(n):
+		return n+n
 	return (ret1, ret2)
 
 
 
 (f1, f2) = f(4)
-print f1()
-print f2()
+print f1(n)
+print f2(n)
 
 

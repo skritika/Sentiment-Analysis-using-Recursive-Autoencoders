@@ -6,11 +6,14 @@ def predict(W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, freq, test_
 	L = We[:,test_sentence]
 	tr = tree(sl, d, num_cat, L)
 	tr.forward(freq, W1, W2, W3, W4, Wcat, b1, b2, b3, bcat, alpha, beta, 0)
-	pred = fcat(np.dot(Wcat,tr.nodeFeatures[:,2*sl-2]))
+	pred = fcat(np.dot(Wcat,tr.nodeFeatures[:,2*sl-2])+bcat)
 	return 1*(pred>0.5)
 			
 def getW(t, d, num_cat, dict_length):
-	theta = t[np.newaxis,:]
+	if t.shape[0] is not 1:
+		theta = t[np.newaxis,:]
+	else:
+		theta = t
 	sW = (d, d)
 	sb = (d, 1)
 	s = d*d
@@ -70,8 +73,9 @@ def backprop(x, training_data, training_labels, freq_original, d, num_cat, dict_
 				gL[:,j:j+1] += np.dot(W.T,tr.parentdelta[:,j:j+1]) + np.dot(Wcat.T,tr.catdelta[:,j:j+1]) - delt 	
 				gWe[:,word_indices[j]] += gL[:,j]
 			cost_J += sum(tr.nodeScores) + sum(tr.nodeScoresR)
-			#print gW1[0,2]
-			#print tr.checkgradient(word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, true_label)
+			actual = gW1[0,2]
+			tr.checkgradient(actual, word_indices, freq, 0.0000000000001, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, true_label)
+			#exit()
 	F = np.ndarray.flatten
 	D = np.dot
 	#final grad computation
