@@ -122,7 +122,6 @@ class tree:
 		return error
 
 	def checkgradient(self,actual, sentence, freq, eps, W1, W2, W3, W4, Wcat, We, b1, b2, b3, bcat, alpha, beta, sl):
-		print "Numerical gradient"
 		w = We[:,sentence]
 		wa, wb = w.copy(), w.copy()
 		W1a, W1b = W1.copy(), W1.copy()
@@ -151,6 +150,4 @@ class tree:
 				grad = (j1-j2)/(2*eps)
 				grad = abs(grad - actual)
 				J_range.append(grad[0])
-		print e_range
-		print J_range
 
